@@ -1,0 +1,5 @@
+{
+    "ext": "ts",
+    "ignore": ["DumpStack.log.tmp"],
+    "exec": "ts-node ./app.ts"
+  }

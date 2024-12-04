@@ -6,13 +6,17 @@ const jwt = require('jsonwebtoken');
 module.exports.register = async (req, res) => {
     try {
         const { name, email, password } = req.body;
+        if (!name || !email || !password) {
+            return res.status(400).json({ message: 'Name, email, and password are required' });
+        }
         const user = await userModel.findOne({ email });
-
+        console.log("hello")
         if (user) {
             return res.status(400).json({ message: 'User already exists' });
         }
 
-        const hash = await bcrypt.hash(password, 10);
+        const hash = await bcrypt.hash(password,10);
+        console.log("hello2")
         const newUser = new userModel({ name, email, password: hash });
 
         await newUser.save();
