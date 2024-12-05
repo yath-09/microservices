@@ -3,6 +3,8 @@ const blacklisttokenModel = require('../models/blacklisttoken.model');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const {subscribeToQueue}=require('../service/rabbit')
+
+const pendingRequests = [];
 module.exports.register = async (req, res) => {
     try {
         const { name, email, password } = req.body;
@@ -96,6 +98,19 @@ module.exports.toggleAvailability = async (req, res) => {
     }
 }
 
-subscribeToQueue("new-ride",(data)=>{
-    console.log(data);
-})
+module.exports.waitForNewRide = async (req, res) => {
+    // Set timeout for long polling here with 30 secs
+    // console.log("ehehe")
+    req.setTimeout(30000, () => {
+        res.status(204).end(); // No Content
+    });
+    pendingRequests.push(res);
+};
+
+subscribeToQueue("new-ride", (data) => {
+    const rideData = JSON.parse(data);
+    pendingRequests.forEach(res => {
+        res.json(rideData);
+    });
+    pendingRequests.length = 0;
+});
