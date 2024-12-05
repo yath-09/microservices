@@ -12,5 +12,9 @@ const cookieParser = require('cookie-parser')
 
 app.use(express.urlencoded({ extended: true }))
 app.use(cookieParser())
+
+const rabbitMq=require('./service/rabbit')
+rabbitMq.connect();
+
 app.use("/",captainRoutes)
 module.exports=app;
